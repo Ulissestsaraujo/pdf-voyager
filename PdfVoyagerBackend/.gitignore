@@ -1,0 +1,21 @@
+# .NET
+appsettings*.json
+bin/
+obj/
+*.user
+*.suo
+
+# Azure/Local Secrets
+.env
+.localenv
+secrets.json
+
+# IDE Files (VS Code, Rider, etc.)
+.vscode/
+.idea/
+
+# Misc
+node_modules/
+dist/
+*.pem
+*.pfx
