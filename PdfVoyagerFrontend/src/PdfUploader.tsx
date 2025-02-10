@@ -1,4 +1,4 @@
-import React, { useState, useCallback, use } from "react";
+import { useState, useCallback } from "react";
 import { useDropzone } from "react-dropzone";
 import { api } from "./helpers/apiConnector";
 const PdfUploader = () => {
@@ -31,7 +31,7 @@ const PdfUploader = () => {
 
         try {
 
-            const { data } = await api.post("/pdf/generate-upload-url", { filename });
+            const { data } = await api.post("/api/pdf/generate-upload-url", { filename });
 
             if (!data.sasUrl) {
                 setUploadStatus("Error: Missing SAS URL response");
@@ -53,7 +53,7 @@ const PdfUploader = () => {
             });
 
 
-            await api.post("/pdf/save-metadata/", {
+            await api.post("/api/pdf/save-metadata/", {
                 userId: "123",
                 filename,
                 blobUrl: data.sasUrl.split("?")[0],
@@ -69,8 +69,8 @@ const PdfUploader = () => {
     };
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 px-4">
-            <div className="bg-white shadow-lg rounded-lg p-6 w-full max-w-lg">
+        <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-6">
+            <div className="bg-white shadow-md rounded-lg p-6 w-full max-w-lg">
                 {/* Drag & Drop Area */}
                 <div
                     {...getRootProps()}
@@ -87,9 +87,6 @@ const PdfUploader = () => {
                 {/* Filename Input */}
                 {file && (
                     <div className="mt-4">
-                        <p className="text-gray-700 font-medium">
-                            <strong>Selected File:</strong> {file.name} ({(file.size / 1024 / 1024).toFixed(2)} MB)
-                        </p>
                         <input
                             type="text"
                             value={filename}
