@@ -2,7 +2,7 @@
 
 PDF Voyager is a **cloud-based document management system** that allows users to **upload, organize, and read PDFs** seamlessly. Built using **React, .NET, and Azure**, this project showcases **modern full-stack development**, cloud infrastructure, and CI/CD best practices.
 
-👉 [Live Demo]([#](https://victorious-plant-099cd7303.4.azurestaticapps.net/))
+👉 [Live Demo](https://victorious-plant-099cd7303.4.azurestaticapps.net/)
 
 ---
 
