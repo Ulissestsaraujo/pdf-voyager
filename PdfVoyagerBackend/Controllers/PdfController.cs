@@ -1,4 +1,6 @@
+using System.Security.Claims;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using PdfVoyagerBackend.Models;
 using PdfVoyagerBackend.Services;
@@ -7,7 +9,8 @@ namespace PdfVoyagerBackend.Controllers;
 
 [ApiController]
 [Route("api/pdf")]
-public class PdfController(AzureBlobService blobService, CosmosDbService dbService, IMapper mapper) : ControllerBase
+[Authorize]
+public class PdfController(AzureBlobService blobService, DbService dbService, IMapper mapper) : ControllerBase
 {
     [HttpPost("generate-upload-url")]
     public async Task<IActionResult> GenerateUploadUrl([FromBody] UploadRequest request)
@@ -17,9 +20,11 @@ public class PdfController(AzureBlobService blobService, CosmosDbService dbServi
     }
     
     [HttpPost("save-metadata")]
-    public async Task<IActionResult> SaveMetadata([FromBody] PdfMetadataRequest request, CosmosDbService cosmosDbService)
+    public async Task<IActionResult> SaveMetadata([FromBody] PdfMetadataRequest request)
     {
+        var userId = GetUserIdFromToken();
         var pdfMetadata = mapper.Map<PdfMetadata>(request);
+        pdfMetadata.UserId = userId;
         if (!await blobService.DocumentExistsAsync(request.FileName))
         {
             return BadRequest("PDF not uploaded yet.");
@@ -31,19 +36,31 @@ public class PdfController(AzureBlobService blobService, CosmosDbService dbServi
     }
     
     
-    [HttpGet("user/{userId}")]
-    public async Task<IActionResult> GetPdfsByUserId(string userId)
+    [HttpGet]
+    public async Task<IActionResult> GetPdfsByUserId()
     {
+        var userId = GetUserIdFromToken();
         var pdfs = await dbService.GetPdfsByUserIdAsync(userId);
         return Ok(pdfs);
     }
     
-    // TODO: When we actually have authentication userIds need to go in auth and not like this.
-    [HttpGet("{userId}/{pdfId}/read-url")]
-    public async Task<IActionResult> GetPdfById(string userId, string pdfId)
+    [HttpGet("{pdfId}/read-url")]
+    public async Task<IActionResult> GetPdfById(string pdfId)
     {
+        var userId = GetUserIdFromToken();
         var pdf = await dbService.GetPdfByIdAsync(userId, pdfId);
         var sasUrl = blobService.GenerateReadSasUrl(pdf.FileName);
         return Ok(sasUrl);
+    }
+    
+    private string GetUserIdFromToken()
+    {
+        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userId))
+        {
+            throw new UnauthorizedAccessException("User ID not found in token.");
+        }
+
+        return userId;
     }
 }

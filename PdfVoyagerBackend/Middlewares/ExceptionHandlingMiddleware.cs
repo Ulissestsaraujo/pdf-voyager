@@ -1,5 +1,4 @@
 using System.Net;
-using Microsoft.Azure.Cosmos;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -18,10 +17,8 @@ public class ExceptionHandlingMiddleware(ILogger<ExceptionHandlingMiddleware> lo
         }
         catch (Exception ex)
         {
-            // Ensure the exception is properly logged
             logger.LogError(ex, "Unhandled exception occurred while processing request: {Path}", context.Request.Path);
             
-            // Handle the exception and return a proper response
             await HandleExceptionAsync(context, ex);
         }
     }
@@ -30,7 +27,6 @@ public class ExceptionHandlingMiddleware(ILogger<ExceptionHandlingMiddleware> lo
     {
         logger.LogError(exception, "Exception caught by middleware");
 
-        // Setup default error response
         var response = context.Response;
         response.ContentType = "application/json";
 
@@ -38,19 +34,11 @@ public class ExceptionHandlingMiddleware(ILogger<ExceptionHandlingMiddleware> lo
         {
             StatusCode = (int)HttpStatusCode.InternalServerError,
             Message = "An unexpected error occurred. Please try again later.",
-            Details = exception.Message // Full details in development
+            Details = exception.Message 
         };
 
-        // Adjust response based on exception type
         switch (exception)
         {
-            case CosmosException cosmosException:
-                response.StatusCode = (int)cosmosException.StatusCode;
-                errorResponse.Message = "A database error occurred.";
-                errorResponse.Details = cosmosException.Message; // Optional for debugging
-                logger.LogWarning("Cosmos DB error: {Message}", cosmosException.Message);
-                break;
-
             case ArgumentNullException:
                 response.StatusCode = (int)HttpStatusCode.BadRequest;
                 errorResponse.Message = "Missing required parameters.";
@@ -69,7 +57,6 @@ public class ExceptionHandlingMiddleware(ILogger<ExceptionHandlingMiddleware> lo
                 break;
         }
 
-        // Serialize and return the response
         var jsonResponse = JsonConvert.SerializeObject(errorResponse);
         await response.WriteAsync(jsonResponse);
     }
