@@ -4,6 +4,7 @@ import { authApi } from "./helpers/apiConnector";
 import * as pdfjs from "pdfjs-dist";
 import "pdfjs-dist/web/pdf_viewer.css";
 import pdfWorker from "pdfjs-dist/build/pdf.worker.min?url";
+import { useDebouncedCallback } from "./hooks/useDebouncedCallback";
 
 pdfjs.GlobalWorkerOptions.workerSrc = pdfWorker;
 
@@ -40,8 +41,42 @@ const PdfViewer = () => {
         console.error("Error fetching read SAS URL:", error);
       }
     };
+    const fetchProgress = async () => {
+      try {
+        const response = await authApi().get(`/api/progress/${pdfId}`);
+        setCurrentPage(response.data || 1);
+      } catch (error) {
+        console.error("Error fetching progress:", error);
+      }
+    };
+    fetchProgress();
     fetchReadSasUrl();
   }, [pdfId]);
+
+  const saveProgress = useDebouncedCallback(async (page: number) => {
+    try {
+      await authApi().post("/api/progress", {
+        PdfId: pdfId,
+        LastPage: page,
+      });
+    } catch (error) {
+      console.error("Error saving progress:", error);
+    }
+  }, 1000);
+
+  useEffect(() => {
+    saveProgress(currentPage);
+  }, [currentPage, saveProgress]);
+
+  const goPrevious = () => {
+    setCurrentPage((prev) => Math.max(prev - (twoPageView ? 2 : 1), 1));
+  };
+
+  const goNext = () => {
+    setCurrentPage((prev) =>
+      numPages ? Math.min(prev + (twoPageView ? 2 : 1), numPages) : prev
+    );
+  };
 
   useEffect(() => {
     if (!sasUrl) return;
@@ -145,11 +180,7 @@ const PdfViewer = () => {
         </div>
         <div className="mt-4 flex justify-between items-center w-full px-6">
           <button
-            onClick={() =>
-              setCurrentPage((prev) =>
-                Math.max(prev - (twoPageView ? 2 : 1), 1)
-              )
-            }
+            onClick={goPrevious}
             disabled={currentPage === 1}
             className="px-4 py-2 bg-gray-300 rounded disabled:opacity-50"
           >
@@ -159,13 +190,7 @@ const PdfViewer = () => {
             Page {currentPage} of {numPages || "?"}
           </p>
           <button
-            onClick={() =>
-              setCurrentPage((prev) =>
-                numPages
-                  ? Math.min(prev + (twoPageView ? 2 : 1), numPages)
-                  : prev
-              )
-            }
+            onClick={goNext}
             disabled={currentPage === numPages}
             className="px-4 py-2 bg-gray-300 rounded disabled:opacity-50"
           >

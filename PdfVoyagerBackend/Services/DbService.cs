@@ -62,4 +62,31 @@ public class DbService(AppDbContext dbContext)
     {
         return await dbContext.Users.FindAsync(userId);
     }
+    
+    public async Task SaveProgressAsync(ReadingProgress readingProgress)
+    {
+        var existing = await dbContext.ReadingProgresses
+            .FirstOrDefaultAsync(p => p.PdfId == readingProgress.PdfId && p.UserId == readingProgress.UserId);
+
+        if (existing != null)
+        {
+            existing.LastPage = readingProgress.LastPage;
+            existing.LastUpdated = DateTime.UtcNow;
+        }
+        else
+        {
+            dbContext.ReadingProgresses.Add(readingProgress);
+        }
+
+        await dbContext.SaveChangesAsync();
+    }
+    
+    public async Task<int> GetProgressAsync(string userId, string pdfId)
+    {
+        var progress = await dbContext.ReadingProgresses
+            .FirstOrDefaultAsync(p => p.PdfId == pdfId && p.UserId == userId);
+
+        return progress?.LastPage ?? 1;
+    }
+    
 }

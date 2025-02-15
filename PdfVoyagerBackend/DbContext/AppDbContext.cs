@@ -8,6 +8,8 @@ public class AppDbContext : Microsoft.EntityFrameworkCore.DbContext
 {
     public DbSet<PdfMetadata> PdfMetadata { get; set; }
     public DbSet<User> Users { get; set; }
+    
+    public DbSet<ReadingProgress> ReadingProgresses { get; set; }
 
     public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
     {
