@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { api, logout } from "../helpers/apiConnector";
+import { logout } from "../helpers/apiConnector";
 import { useAuth } from "../context/AuthContext";
 
 const Navbar: React.FC = () => {
