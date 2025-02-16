@@ -11,9 +11,11 @@ PDF Voyager is a **cloud-based document management system** that allows users to
 - **Drag & Drop PDF Uploads** – Upload PDFs to **Azure Blob Storage** via a user-friendly interface.
 - **Document Library** – View all uploaded PDFs with metadata (**title, upload date, user ID**).
 - **Secure PDF Viewer** – Open and read PDFs stored in Azure, with **read-only SAS token authentication**.
-- **Cross-Device Sync** – Progress is saved, allowing users to **resume where they left off**. *TODO*
-- **Secure Authentication** – Integrated **Azure AD B2C** for seamless authentication. *TODO*
+- **Cross-Device Sync** – Progress is saved, allowing users to **resume where they left off**. 
+- **Secure Authentication** – HttpOnly Secure Cookies with JWT access and refresh tokens.
 - **Cost-Effective & Scalable** – Built using Azure services with **serverless hosting** and 90% Free tier.
+- **Highlighting and Note taking** - Enable highlights and notes to be taken. Add direct access to highlights.
+- **Customizable color pallettes for Highlighting** - Enable the user to pick a small pallette of colors that they which to colour their highlights with.
 
 ---
 
@@ -24,9 +26,9 @@ PDF Voyager is a **cloud-based document management system** that allows users to
 ↓
 [Azure Blob Storage] → PDF Files
 ↓
-[Azure Cosmos DB] → Metadata
+[Azure MySQL] → PDF Metadata, Reading Progresses and Notes
 ↓
-[Azure AD B2C] → Authentication
+[JWT & Azure Key Vault] → Authentication & Secrets
 ---
 
 ## 💻 Tech Stack
@@ -36,12 +38,12 @@ PDF Voyager is a **cloud-based document management system** that allows users to
 - **Vite** – Fast and optimized React builds.
 - **Tailwind CSS** – Beautiful and scalable styling.
 - **React Router** – SPA navigation.
-- **pdf.js** – High-performance PDF rendering.
+- **pdf.js & react-pdf** – High-performance PDF rendering.
 
 ### **Backend**
 - **.NET 9 (C#)** – RESTful API with clean architecture.
 - **Azure Blob Storage** – Secure PDF storage.
-- **Azure Cosmos DB** – NoSQL database for metadata storage.
+- **Azure MySQL** – SQL database for storage.
 - **Azure Key Vault** – Securely managing API secrets.
 
 ### **DevOps & Deployment**
