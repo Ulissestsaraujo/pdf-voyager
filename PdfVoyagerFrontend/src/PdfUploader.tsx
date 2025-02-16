@@ -1,6 +1,6 @@
 import { useState, useCallback } from "react";
 import { useDropzone } from "react-dropzone";
-import { api, authApi } from "./helpers/apiConnector";
+import { api } from "./helpers/apiConnector";
 const PdfUploader = () => {
   const [file, setFile] = useState<File | null>(null);
   const [filename, setFilename] = useState("");
@@ -28,7 +28,7 @@ const PdfUploader = () => {
     setUploadStatus("Generating upload URL...");
 
     try {
-      const { data } = await authApi().post("/api/pdf/generate-upload-url", {
+      const { data } = await api.post("/api/pdf/generate-upload-url", {
         filename,
       });
 
@@ -52,7 +52,7 @@ const PdfUploader = () => {
         },
       });
 
-      await authApi().post("/api/pdf/save-metadata/", {
+      await api.post("/api/pdf/save-metadata/", {
         filename,
         blobUrl: data.sasUrl.split("?")[0],
       });

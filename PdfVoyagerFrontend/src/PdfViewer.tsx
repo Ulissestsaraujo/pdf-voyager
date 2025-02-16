@@ -13,10 +13,10 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
   "pdfjs-dist/build/pdf.worker.min.mjs",
   import.meta.url
 ).toString();
-import { authApi } from "./helpers/apiConnector";
 import { useDebouncedCallback } from "./hooks/useDebouncedCallback";
 
 import "./PdfViewer.css";
+import { api } from "./helpers/apiConnector";
 
 const PdfViewer = () => {
   const { pdfId } = useParams<{ pdfId: string }>();
@@ -31,7 +31,7 @@ const PdfViewer = () => {
   useEffect(() => {
     const fetchReadSasUrl = async () => {
       try {
-        const response = await authApi().get(`/api/pdf/${pdfId}/read-url`);
+        const response = await api.get(`/api/pdf/${pdfId}/read-url`);
         setSasUrl(response.data.result);
       } catch (error) {
         console.error("Error fetching read SAS URL:", error);
@@ -40,7 +40,7 @@ const PdfViewer = () => {
 
     const fetchProgress = async () => {
       try {
-        const response = await authApi().get(`/api/progress/${pdfId}`);
+        const response = await api.get(`/api/progress/${pdfId}`);
         setCurrentPage(response.data || 1);
       } catch (error) {
         console.error("Error fetching progress:", error);
@@ -57,7 +57,7 @@ const PdfViewer = () => {
 
   const saveProgress = useDebouncedCallback(async (page: number) => {
     try {
-      await authApi().post("/api/progress", {
+      await api.post("/api/progress", {
         PdfId: pdfId,
         LastPage: page,
       });

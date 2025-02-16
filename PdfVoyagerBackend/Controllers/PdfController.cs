@@ -55,7 +55,7 @@ public class PdfController(AzureBlobService blobService, DbService dbService, IM
     
     private string GetUserIdFromToken()
     {
-        var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var userId = User.FindFirst("id")?.Value;
         if (string.IsNullOrEmpty(userId))
         {
             throw new UnauthorizedAccessException("User ID not found in token.");

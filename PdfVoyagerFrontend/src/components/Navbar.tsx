@@ -1,12 +1,13 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { api, logout } from "../helpers/apiConnector";
+import { useAuth } from "../context/AuthContext";
 
 const Navbar: React.FC = () => {
-  const token = localStorage.getItem("token");
   const navigate = useNavigate();
-
+  const { isAuthenticated } = useAuth();
   const handleLogout = (): void => {
-    localStorage.removeItem("token");
+    logout();
     navigate("/login");
   };
 
@@ -20,7 +21,7 @@ const Navbar: React.FC = () => {
           PDF Voyager
         </Link>
         <div className="flex space-x-6">
-          {token && (
+          {isAuthenticated && (
             <>
               <Link
                 to="/"
@@ -36,7 +37,7 @@ const Navbar: React.FC = () => {
               </Link>
             </>
           )}
-          {token ? (
+          {isAuthenticated ? (
             <button
               onClick={handleLogout}
               className="hover:bg-blue-700 px-4 py-2 rounded transition"

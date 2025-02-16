@@ -1,9 +1,13 @@
-import React from "react";
 import { Navigate, Outlet } from "react-router-dom";
+import { useAuthCheck } from "./hooks/useAuthCheck";
 
-const ProtectedRoute: React.FC = () => {
-  const token = localStorage.getItem("token");
-  return token ? <Outlet /> : <Navigate to="/login" replace />;
+export const ProtectedRoute = () => {
+  const { isAuthenticated, isLoading } = useAuthCheck();
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  return isAuthenticated ? <Outlet /> : <Navigate to="/login" replace />;
 };
-
 export default ProtectedRoute;

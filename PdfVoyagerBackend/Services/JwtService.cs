@@ -8,26 +8,103 @@ namespace PdfVoyagerBackend.Services;
 
 public class JwtService(IConfiguration configuration)
 {
-    public string GenerateJwtToken(User user)
-    {
-        var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(configuration["Jwt:Secret"]));
-        var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
+    private readonly SymmetricSecurityKey _securityKey = new(Encoding.UTF8.GetBytes(configuration["Jwt:Secret"]));
+  public string GenerateJwtToken(User user)
+      {
+          var claims = new[]
+          {
+              new Claim(JwtRegisteredClaimNames.Sub, user.Email),
+              new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+              new Claim("id", user.Id)
+          };
+  
+          return GenerateToken(
+              claims,
+              DateTime.UtcNow.AddMinutes(2), // Shorter expiration for access token
+              configuration["Jwt:Issuer"]!,
+              configuration["Jwt:Audience"]!
+          );
+      }
 
-        var claims = new[]
+      public string GenerateRefreshToken(User user)
+      {
+          var claims = new[]
+          {
+              new Claim(ClaimTypes.NameIdentifier, user.Id),
+              new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
+              new Claim("refresh", "true")
+          };
+
+          return GenerateToken(
+              claims,
+              DateTime.UtcNow.AddDays(7), // Longer expiration for refresh token
+              configuration["Jwt:Issuer"]!,
+              configuration["Jwt:Audience"]!
+          );
+      }
+    
+    private string GenerateToken(
+        IEnumerable<Claim> claims,
+        DateTime expiration,
+        string issuer,
+        string audience)
+    {
+        var tokenDescriptor = new SecurityTokenDescriptor
         {
-            new Claim(JwtRegisteredClaimNames.Sub, user.Email),
-            new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-            new Claim(ClaimTypes.NameIdentifier, user.Id)
+            Subject = new ClaimsIdentity(claims),
+            Expires = expiration,
+            Issuer = issuer,
+            Audience = audience,
+            SigningCredentials = new SigningCredentials(
+                 _securityKey,
+                SecurityAlgorithms.HmacSha256Signature
+            )
         };
 
-        var token = new JwtSecurityToken(
-            issuer: configuration["Jwt:Issuer"],
-            audience: configuration["Jwt:Audience"],
-            claims: claims,
-            expires: DateTime.Now.AddHours(1),
-            signingCredentials: credentials
-        );
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var token = tokenHandler.CreateToken(tokenDescriptor);
+        return tokenHandler.WriteToken(token);
+    }
+    
+    private ClaimsPrincipal? ValidateToken(string token, bool isRefreshToken = false)
+    {
+        try
+        {
+            var tokenHandler = new JwtSecurityTokenHandler();
+            var validationParameters = new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = _securityKey,
+                ValidateIssuer = true,
+                ValidIssuer = configuration["Jwt:Issuer"],
+                ValidateAudience = true,
+                ValidAudience = configuration["Jwt:Audience"],
+                ValidateLifetime = true,
+                ClockSkew = TimeSpan.Zero
+            };
 
-        return new JwtSecurityTokenHandler().WriteToken(token);
+            var principal = tokenHandler.ValidateToken(token, validationParameters, out _);
+            
+            if (isRefreshToken)
+            {
+                if (!principal.HasClaim(c => c.Type == "refresh" && c.Value == "true"))
+                {
+                    throw new SecurityTokenException("Invalid refresh token");
+                }
+            }
+
+            return principal;
+        }
+        catch
+        {
+            return null;
+        }
+    }
+
+    public string GetUserIdFromRefreshToken(string refreshToken)
+    {
+        var principal = ValidateToken(refreshToken, true);
+        return principal?.FindFirstValue(ClaimTypes.NameIdentifier) 
+               ?? throw new SecurityTokenException("Invalid refresh token");
     }
 }

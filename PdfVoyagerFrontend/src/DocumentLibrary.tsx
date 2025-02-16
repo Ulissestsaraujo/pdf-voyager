@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { authApi } from "./helpers/apiConnector";
+import { api } from "./helpers/apiConnector";
 import { Link } from "react-router-dom";
 
 interface PdfMetadata {
@@ -17,7 +17,7 @@ const DocumentLibrary = () => {
   useEffect(() => {
     const fetchPdfs = async () => {
       try {
-        const { data } = await authApi().get("/api/pdf");
+        const { data } = await api.get("/api/pdf");
         setPdfs(data);
       } catch (error) {
         console.error("Failed to fetch PDFs:", error);

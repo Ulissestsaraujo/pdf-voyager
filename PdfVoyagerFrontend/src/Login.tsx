@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { api } from "./helpers/apiConnector";
+import { api, logout } from "./helpers/apiConnector";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -10,20 +10,17 @@ const Login = () => {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-
     try {
-      const response = await api.post("/api/auth/login", { email, password });
+      await api.post("/api/auth/login", { email, password });
 
-      if (response.data) {
-        localStorage.setItem("token", response.data.token);
-        navigate("/");
-      } else {
-        const data = response.data;
-        setError(data.message || "Login failed.");
-      }
+      // Wait for cookies to be set
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      navigate("/");
     } catch (err) {
-      setError("An error occurred. Please try again.");
-      console.info("An error occurred. Please try again." + err);
+      console.error("Login error:", err);
+      await logout();
+      setError("Login failed. Please try again.");
     }
   };
 
