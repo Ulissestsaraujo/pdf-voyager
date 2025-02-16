@@ -1,7 +1,8 @@
-.ReactPDF__Page {
-  max-width: 100%;
-  canvas {
-    max-width: 100% !important;
-    height: auto !important;
-  }
+/* PdfViewer.css */
+.react-pdf__Page {
+  overflow: auto;
+}
+
+.react-pdf__Page canvas {
+  height: auto !important;
 }

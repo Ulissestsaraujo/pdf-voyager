@@ -1,5 +1,5 @@
 import { useParams } from "react-router-dom";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { pdfjs, Document, Page } from "react-pdf";
 import "react-pdf/dist/esm/Page/AnnotationLayer.css";
 import "react-pdf/dist/esm/Page/TextLayer.css";
@@ -20,12 +20,14 @@ import { api } from "./helpers/apiConnector";
 
 const PdfViewer = () => {
   const { pdfId } = useParams<{ pdfId: string }>();
+  const [pdfDoc, setPdfDoc] = useState<pdfjs.PDFDocumentProxy | null>(null);
   const [sasUrl, setSasUrl] = useState<string | null>(null);
   const [numPages, setNumPages] = useState<number | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [pageInput, setPageInput] = useState(currentPage.toString());
   const containerRef = useRef<HTMLDivElement>(null);
   const [scale, setScale] = useState(1);
+  const [isManualZoom, setIsManualZoom] = useState(false);
   const devicePixelRatio = window.devicePixelRatio || 1;
 
   useEffect(() => {
@@ -51,9 +53,38 @@ const PdfViewer = () => {
     fetchReadSasUrl();
   }, [pdfId]);
 
-  const zoomIn = () => setScale((prev) => Math.min(prev + 0.25, 3));
-  const zoomOut = () => setScale((prev) => Math.max(prev - 0.25, 0.25));
-  const resetZoom = () => setScale(1);
+  const calculateScale = useCallback(
+    async (pageNumber: number = currentPage) => {
+      if (!containerRef.current || !pdfDoc) return;
+
+      try {
+        const page = await pdfDoc.getPage(pageNumber);
+        const viewport = page.getViewport({ scale: 1 });
+        const containerWidth = containerRef.current.offsetWidth;
+
+        // Calculate scale to fit container width accounting for device pixel ratio
+        const newScale = containerWidth / (viewport.width * devicePixelRatio);
+        setScale(newScale);
+      } catch (error) {
+        console.error("Error calculating scale:", error);
+      }
+    },
+    [pdfDoc, currentPage, devicePixelRatio]
+  );
+
+  const zoomIn = () => {
+    setIsManualZoom(true);
+    setScale((prev) => Math.min(prev + 0.25, 3));
+  };
+
+  const zoomOut = () => {
+    setIsManualZoom(true);
+    setScale((prev) => Math.max(prev - 0.25, 0.25));
+  };
+  const resetZoom = () => {
+    setIsManualZoom(false);
+    calculateScale();
+  };
 
   const saveProgress = useDebouncedCallback(async (page: number) => {
     try {
@@ -95,10 +126,14 @@ const PdfViewer = () => {
     }
   };
 
-  const onDocumentLoadSuccess = ({ numPages }: { numPages: number }) => {
-    setNumPages(numPages);
-  };
-
+  const onDocumentLoadSuccess = useCallback(
+    async (pdf: pdfjs.PDFDocumentProxy) => {
+      setNumPages(pdf.numPages);
+      setPdfDoc(pdf);
+      await calculateScale(1);
+    },
+    [calculateScale]
+  );
   const validatePageInput = () => {
     if (!numPages) return;
 
@@ -112,6 +147,14 @@ const PdfViewer = () => {
     setPageInput(newPage.toString());
   };
 
+  useEffect(() => {
+    if (!containerRef.current || isManualZoom) return;
+
+    const resizeObserver = new ResizeObserver(() => calculateScale());
+    resizeObserver.observe(containerRef.current);
+
+    return () => resizeObserver.disconnect();
+  }, [calculateScale, isManualZoom]);
   if (!sasUrl) return <div>Loading...</div>;
 
   return (
