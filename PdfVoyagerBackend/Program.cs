@@ -61,6 +61,17 @@ builder.Services.AddAuthentication(options =>
             {
                 context.Token = context.Request.Cookies["accessToken"];
                 return Task.CompletedTask;
+            },
+            OnChallenge = context =>
+            {
+                if (context.AuthenticateFailure is SecurityTokenExpiredException)
+                {
+                    context.Response.StatusCode = 401;
+                    context.Response.ContentType = "application/json";
+                    return context.Response.WriteAsync("{\"message\": \"Token expired\"}");
+                }
+
+                return Task.CompletedTask;
             }
         };
     });

@@ -1,10 +1,10 @@
 import React from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { logout } from "../helpers/apiConnector";
 import { useAuth } from "../context/AuthContext";
 
 const Navbar: React.FC = () => {
   const navigate = useNavigate();
+  const { logout } = useAuth();
   const { isAuthenticated } = useAuth();
   const handleLogout = (): void => {
     logout();

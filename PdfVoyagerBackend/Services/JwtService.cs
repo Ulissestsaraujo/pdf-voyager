@@ -30,7 +30,7 @@ public class JwtService(IConfiguration configuration)
       {
           var claims = new[]
           {
-              new Claim(ClaimTypes.NameIdentifier, user.Id),
+              new Claim("id", user.Id),
               new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
               new Claim("refresh", "true")
           };
@@ -104,7 +104,7 @@ public class JwtService(IConfiguration configuration)
     public string GetUserIdFromRefreshToken(string refreshToken)
     {
         var principal = ValidateToken(refreshToken, true);
-        return principal?.FindFirstValue(ClaimTypes.NameIdentifier) 
+        return principal?.FindFirstValue("id") 
                ?? throw new SecurityTokenException("Invalid refresh token");
     }
 }

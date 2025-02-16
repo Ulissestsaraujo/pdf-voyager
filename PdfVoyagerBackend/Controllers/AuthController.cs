@@ -1,3 +1,4 @@
+using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -47,21 +48,15 @@ public class AuthController(DbService dbService, JwtService jwtService, IWebHost
 
     [HttpGet("user-info")]
     [Authorize]
-    public async Task<IActionResult> GetUserInfo()
+    public IActionResult GetUserInfo()
     {
-        var userId = User.FindFirst("id")?.Value;
-        if (string.IsNullOrEmpty(userId))
+        var userEmail = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userEmail))
         {
             return Unauthorized();
         }
 
-        var user = await dbService.GetUserByIdAsync(userId);
-        if (user == null)
-        {
-            return NotFound();
-        }
-
-        return Ok(new { user.Email });
+        return Ok(new { Email = userEmail });
     }
 
     [HttpPost("logout")]

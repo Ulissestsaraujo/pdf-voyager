@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { api, logout } from "./helpers/apiConnector";
+import { useAuth } from "./context/AuthContext";
 
 const Login = () => {
+  const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -10,16 +11,10 @@ const Login = () => {
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      await api.post("/api/auth/login", { email, password });
-
-      // Wait for cookies to be set
-      await new Promise((resolve) => setTimeout(resolve, 100));
-
+    const success = await login(email, password);
+    if (success) {
       navigate("/");
-    } catch (err) {
-      console.error("Login error:", err);
-      await logout();
+    } else {
       setError("Login failed. Please try again.");
     }
   };

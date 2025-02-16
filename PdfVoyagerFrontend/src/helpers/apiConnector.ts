@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import axios from "axios";
 
 export const api = axios.create({
@@ -9,42 +10,71 @@ export const api = axios.create({
 });
 
 export const refreshToken = async () => {
-  await api.post("/api/auth/refresh");
+  try {
+    const resp = await api.post("/api/auth/refresh");
+    return resp.data.expiresIn;
+  } catch (e) {
+    console.log("Error", e);
+    throw e;
+  }
 };
 
 export const logout = async () => {
   await api.post("/api/auth/logout");
   window.location.href = "/login";
 };
-
 let isRefreshing = false;
-let failedRequests: (() => void)[] = [];
+let failedQueue: any[] = [];
 
+const processQueue = (error: any, token: string | null = null) => {
+  failedQueue.forEach((prom) => {
+    if (token) {
+      prom.resolve(token);
+    } else {
+      prom.reject(error);
+    }
+  });
+  failedQueue = [];
+};
+
+// Axios response interceptor
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const originalRequest = error.config;
 
-    if (error.response?.status === 401 && !originalRequest._retry) {
-      if (isRefreshing) {
-        return new Promise((resolve) => {
-          failedRequests.push(() => resolve(api(originalRequest)));
-        });
-      }
+    if (error.response?.status === 401) {
+      const message = error.response.data?.message;
 
-      originalRequest._retry = true;
-      isRefreshing = true;
+      if (message === "Token expired") {
+        if (isRefreshing) {
+          return new Promise((resolve, reject) => {
+            failedQueue.push({ resolve, reject });
+          })
+            .then(() => {
+              originalRequest._retry = true;
+              return api(originalRequest);
+            })
+            .catch((err) => Promise.reject(err));
+        }
 
-      try {
-        await refreshToken();
-        isRefreshing = false;
-        failedRequests.forEach((cb) => cb());
-        failedRequests = [];
-        return api(originalRequest);
-      } catch (refreshError) {
-        console.error("Error refreshing token:", refreshError);
-        await logout();
-        return Promise.reject(error);
+        originalRequest._retry = true;
+        isRefreshing = true;
+
+        try {
+          const { data } = await api.post(
+            "/api/auth/refresh",
+            {},
+            { withCredentials: true }
+          );
+          processQueue(null, data.accessToken);
+          return api(originalRequest);
+        } catch (refreshError) {
+          processQueue(refreshError, null);
+          return Promise.reject(refreshError);
+        } finally {
+          isRefreshing = false;
+        }
       }
     }
 
