@@ -1,5 +1,5 @@
 import { ReactNode, useEffect, useState } from "react";
-import { useStorageAccess } from "../hooks/useStorageAccess";
+import { useStorageAccess } from "./useStorageAccess";
 
 interface StorageGateProps {
   children: ReactNode;
