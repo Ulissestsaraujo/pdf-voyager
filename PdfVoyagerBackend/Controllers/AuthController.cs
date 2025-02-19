@@ -131,15 +131,6 @@ public class AuthController(DbService dbService, JwtService jwtService, IWebHost
             cookieOptionsAccess.Domain = "localhost";
             cookieOptionsRefresh.Domain = "localhost";
         }
-        
-        if (!environment.IsDevelopment())
-        {
-            cookieOptionsAccess.Domain = "victorious-plant-099cd7303.4.azurestaticapps.net";
-            cookieOptionsRefresh.Domain = "victorious-plant-099cd7303.4.azurestaticapps.net";
-        }
-        
-        
-        
 
         Response.Cookies.Append("accessToken", accessToken, cookieOptionsAccess);
 
