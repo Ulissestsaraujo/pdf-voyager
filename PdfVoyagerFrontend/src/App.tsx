@@ -9,7 +9,6 @@ import Register from "./Register";
 import ProtectedRoute from "./ProtectedRoute";
 import { AuthProvider } from "./context/AuthContext";
 import { ThemeProvider } from "./context/ThemeContext";
-import { StorageGate } from "./components/StorageGate";
 
 const App: React.FC = () => {
   return (
@@ -18,18 +17,16 @@ const App: React.FC = () => {
         <BrowserRouter>
           <Navbar />
           <main className="pt-20 px-4 sm:px-8 md:px-16 lg:px-32">
-            <StorageGate>
-              <Routes>
-                <Route path="/login" element={<Login />} />
-                <Route path="/register" element={<Register />} />
+            <Routes>
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
 
-                <Route element={<ProtectedRoute />}>
-                  <Route path="/" element={<DocumentLibrary />} />
-                  <Route path="/upload" element={<PdfUploader />} />
-                  <Route path="/pdf/:pdfId" element={<PdfViewer />} />
-                </Route>
-              </Routes>
-            </StorageGate>
+              <Route element={<ProtectedRoute />}>
+                <Route path="/" element={<DocumentLibrary />} />
+                <Route path="/upload" element={<PdfUploader />} />
+                <Route path="/pdf/:pdfId" element={<PdfViewer />} />
+              </Route>
+            </Routes>
           </main>
         </BrowserRouter>
       </AuthProvider>
