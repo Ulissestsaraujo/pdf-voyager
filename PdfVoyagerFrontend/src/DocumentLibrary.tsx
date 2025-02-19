@@ -32,8 +32,8 @@ const DocumentLibrary = () => {
     return <div className="text-center text-gray-600">Loading...</div>;
 
   return (
-    <div className="container mx-auto p-6">
-      <h1 className="text-3xl font-bold text-gray-800 mb-6">
+    <div className="container mx-auto p-6 min-h-screen bg-white dark:bg-gray-800">
+      <h1 className="text-3xl font-bold text-slate-800 dark:text-gray-200 mb-6">
         Document Library
       </h1>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -41,12 +41,12 @@ const DocumentLibrary = () => {
           <Link
             key={pdf.id}
             to={`/pdf/${pdf.id}`}
-            className="block bg-white shadow-md rounded-lg p-4 transition hover:shadow-lg"
+            className="block bg-white dark:bg-gray-700 shadow-md rounded-lg p-4 transition hover:shadow-lg border border-slate-200 dark:border-gray-600 hover:bg-slate-50 dark:hover:bg-gray-600"
           >
-            <h3 className="font-semibold text-lg text-gray-800 truncate">
+            <h3 className="font-semibold text-lg text-slate-800 dark:text-gray-200 truncate">
               {pdf.fileName}
             </h3>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-slate-600 dark:text-gray-400">
               Uploaded: {new Date(pdf.uploadDate).toLocaleDateString()}
             </p>
           </Link>
@@ -55,5 +55,4 @@ const DocumentLibrary = () => {
     </div>
   );
 };
-
 export default DocumentLibrary;

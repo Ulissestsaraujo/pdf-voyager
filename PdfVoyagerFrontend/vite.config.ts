@@ -28,7 +28,7 @@ export default defineConfig({
     }),
   ],
   build: {
-    outDir: "dist", // ✅ Set a consistent build output directory
+    outDir: "dist",
     rollupOptions: {
       output: {
         manualChunks: {
@@ -38,10 +38,10 @@ export default defineConfig({
     },
   },
   server: {
-    port: 3000, // ✅ Set a consistent local development port
+    port: 3000,
   },
   preview: {
-    port: 4173, // ✅ Ensure Azure Static Web Apps preview works
+    port: 4173,
   },
   base: "/",
 });

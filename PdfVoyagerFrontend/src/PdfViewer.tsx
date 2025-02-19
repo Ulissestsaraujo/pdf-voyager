@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { pdfjs, Document, Page } from "react-pdf";
 import "react-pdf/dist/esm/Page/AnnotationLayer.css";
 import "react-pdf/dist/esm/Page/TextLayer.css";
+import "./PdfViewer.css";
 
 const options = {
   cMapUrl: "/cmaps/",
@@ -15,7 +16,6 @@ pdfjs.GlobalWorkerOptions.workerSrc = new URL(
 ).toString();
 import { useDebouncedCallback } from "./hooks/useDebouncedCallback";
 
-import "./PdfViewer.css";
 import { api } from "./helpers/apiConnector";
 
 const PdfViewer = () => {
@@ -158,29 +158,29 @@ const PdfViewer = () => {
   if (!sasUrl) return <div>Loading...</div>;
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-6">
-      <div className="bg-white shadow-lg rounded-lg p-4 w-full max-w-7xl flex flex-col items-center">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-slate-50 dark:bg-gray-900 p-6">
+      <div className="bg-white dark:bg-gray-800 shadow-xl rounded-lg p-4 w-full max-w-7xl flex flex-col items-center border border-slate-200 dark:border-gray-700">
         {/* Top Controls */}
         <div className="w-full flex flex-wrap gap-4 justify-between items-center mb-4 px-2">
           <div className="flex items-center gap-2">
             <button
               onClick={zoomOut}
-              className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300"
+              className="px-3 py-1 bg-slate-100 dark:bg-gray-700 text-slate-800 dark:text-gray-200 rounded hover:bg-slate-200 dark:hover:bg-gray-600"
             >
               -
             </button>
-            <span className="w-20 text-center">
+            <span className="w-20 text-center text-slate-800 dark:text-gray-300">
               {(scale * 100).toFixed(0)}%
             </span>
             <button
               onClick={zoomIn}
-              className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300"
+              className="px-3 py-1 bg-slate-100 dark:bg-gray-700 text-slate-800 dark:text-gray-200 rounded hover:bg-slate-200 dark:hover:bg-gray-600"
             >
               +
             </button>
             <button
               onClick={resetZoom}
-              className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 ml-2"
+              className="px-3 py-1 bg-slate-100 dark:bg-gray-700 text-slate-800 dark:text-gray-200 rounded hover:bg-slate-200 dark:hover:bg-gray-600 ml-2"
             >
               Reset
             </button>
@@ -190,7 +190,7 @@ const PdfViewer = () => {
             <button
               onClick={goPrevious}
               disabled={currentPage === 1}
-              className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
+              className="px-3 py-1 bg-slate-100 dark:bg-gray-700 text-slate-800 dark:text-gray-200 rounded hover:bg-slate-200 dark:hover:bg-gray-600 disabled:opacity-50"
             >
               Prev
             </button>
@@ -203,14 +203,16 @@ const PdfViewer = () => {
                 onKeyDown={(e) => e.key === "Enter" && validatePageInput()}
                 min="1"
                 max={numPages || 1}
-                className="w-16 px-2 py-1 border rounded text-center"
+                className="w-16 px-2 py-1 bg-white dark:bg-gray-700 border border-slate-200 dark:border-gray-600 rounded text-slate-800 dark:text-gray-200 text-center"
               />
-              <span>of {numPages || "?"}</span>
+              <span className="text-slate-800 dark:text-gray-300">
+                of {numPages || "?"}
+              </span>
             </div>
             <button
               onClick={goNext}
               disabled={currentPage === numPages}
-              className="px-3 py-1 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50"
+              className="px-3 py-1 bg-slate-100 dark:bg-gray-700 text-slate-800 dark:text-gray-200 rounded hover:bg-slate-200 dark:hover:bg-gray-600 disabled:opacity-50"
             >
               Next
             </button>
@@ -220,7 +222,7 @@ const PdfViewer = () => {
         {/* PDF Container */}
         <div
           ref={containerRef}
-          className="flex justify-center w-full min-h-[85vh] items-start overflow-auto p-4"
+          className="flex justify-center w-full min-h-[85vh] items-start overflow-auto p-4 bg-slate-100 dark:bg-gray-700 rounded-lg"
         >
           <Document
             file={sasUrl}
@@ -228,11 +230,11 @@ const PdfViewer = () => {
             className="flex flex-col items-center gap-4"
             options={options}
           >
-            <div className="w-full">
+            <div className="w-full bg-white dark:bg-gray-600 rounded shadow-sm">
               <Page
                 pageNumber={currentPage}
                 scale={scale * devicePixelRatio}
-                className="shadow-md border border-gray-300 mx-auto"
+                className="shadow-md border border-slate-200 dark:border-gray-600 mx-auto"
               />
             </div>
           </Document>

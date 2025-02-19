@@ -10,33 +10,35 @@ const Register = () => {
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
-
     try {
       const response = await api.post("/api/auth/register", {
         email,
         password,
       });
-
       if (response.data) {
         navigate("/login");
       } else {
-        const data = response.data;
-        setError(data.message || "Login failed.");
+        setError("Registration failed. Please try again.");
       }
     } catch (err) {
+      console.error(err);
       setError("An error occurred. Please try again.");
-      console.info("An error occurred. Please try again." + err);
     }
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <div className="bg-white p-8 rounded-lg shadow-md w-96">
-        <h2 className="text-2xl font-bold mb-6 text-center">Register</h2>
+    <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-gray-900">
+      <div className="bg-white dark:bg-gray-800 p-8 rounded-xl shadow-lg w-96 border border-slate-200 dark:border-gray-700">
+        <h2 className="text-2xl font-bold text-slate-800 dark:text-gray-200 mb-6 text-center">
+          Register
+        </h2>
         {error && <p className="text-red-500 mb-4 text-center">{error}</p>}
         <form onSubmit={handleRegister}>
           <div className="mb-4">
-            <label className="block text-sm font-medium mb-2" htmlFor="email">
+            <label
+              className="block text-sm font-medium mb-2 text-slate-700 dark:text-gray-300"
+              htmlFor="email"
+            >
               Email
             </label>
             <input
@@ -44,13 +46,14 @@ const Register = () => {
               id="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded-lg"
+              className="w-full p-2 bg-white dark:bg-gray-700 border border-slate-200 dark:border-gray-600 rounded-lg text-slate-800 dark:text-gray-200 focus:ring-2 focus:ring-slate-500 dark:focus:ring-indigo-500"
+              placeholder="example@email.com"
               required
             />
           </div>
           <div className="mb-6">
             <label
-              className="block text-sm font-medium mb-2"
+              className="block text-sm font-medium mb-2 text-slate-700 dark:text-gray-300"
               htmlFor="password"
             >
               Password
@@ -60,20 +63,24 @@ const Register = () => {
               id="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full p-2 border border-gray-300 rounded-lg"
+              className="w-full p-2 bg-white dark:bg-gray-700 border border-slate-200 dark:border-gray-600 rounded-lg text-slate-800 dark:text-gray-200 focus:ring-2 focus:ring-slate-500 dark:focus:ring-indigo-500"
+              placeholder="••••••••"
               required
             />
           </div>
           <button
             type="submit"
-            className="w-full bg-blue-500 text-white p-2 rounded-lg hover:bg-blue-600"
+            className="w-full bg-slate-800 hover:bg-slate-900 dark:bg-indigo-600 dark:hover:bg-indigo-700 text-white dark:text-white p-2 rounded-lg transition-colors duration-200"
           >
             Register
           </button>
         </form>
-        <p className="mt-4 text-center">
+        <p className="mt-4 text-center text-slate-700 dark:text-gray-400">
           Already have an account?{" "}
-          <a href="/login" className="text-blue-500 hover:underline">
+          <a
+            href="/login"
+            className="text-slate-800 dark:text-indigo-400 hover:underline"
+          >
             Login here
           </a>
         </p>

@@ -67,18 +67,20 @@ const PdfUploader = () => {
   };
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-6">
-      <div className="bg-white shadow-md rounded-lg p-6 w-full max-w-lg">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-slate-50 dark:bg-gray-900 p-6">
+      <div className="bg-white dark:bg-gray-800 shadow-xl rounded-lg p-6 w-full max-w-lg border border-slate-200 dark:border-gray-700">
         <div
           {...getRootProps()}
-          className="border-2 border-dashed border-blue-500 bg-blue-50 hover:bg-blue-100 text-blue-600 font-medium p-6 text-center rounded-lg cursor-pointer transition"
+          className="border-2 border-dashed border-slate-400 dark:border-gray-500 bg-slate-100 dark:bg-gray-700 hover:bg-slate-200 dark:hover:bg-gray-600 text-slate-700 dark:text-gray-300 font-medium p-6 text-center rounded-lg cursor-pointer transition"
         >
           <input {...getInputProps()} />
           {isDragActive ? (
-            <p className="text-blue-700 font-semibold">Drop the PDF here...</p>
+            <p className="text-slate-800 dark:text-gray-200 font-semibold">
+              Drop the PDF here...
+            </p>
           ) : (
-            <p className="text-gray-600">
-              Drag & drop a PDF here, or click to select one
+            <p className="text-slate-700 dark:text-gray-300">
+              Drag & drop or click to upload
             </p>
           )}
         </div>
@@ -88,7 +90,7 @@ const PdfUploader = () => {
               type="text"
               value={filename}
               onChange={(e) => setFilename(e.target.value)}
-              className="w-full mt-2 p-2 border rounded-lg text-gray-700 focus:ring-2 focus:ring-blue-500"
+              className="w-full mt-2 p-2 bg-white dark:bg-gray-700 border border-slate-200 dark:border-gray-600 rounded-lg text-slate-800 dark:text-gray-200 focus:ring-2 focus:ring-slate-500"
               placeholder="Enter custom filename..."
             />
           </div>
@@ -97,13 +99,13 @@ const PdfUploader = () => {
           <button
             onClick={handleUpload}
             disabled={!filename}
-            className="mt-4 w-full bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition disabled:bg-gray-400"
+            className="mt-4 w-full bg-slate-800 hover:bg-slate-900 text-white py-2 rounded-lg transition disabled:bg-gray-400 dark:disabled:bg-gray-600"
           >
             Upload PDF
           </button>
         )}
         {uploadStatus && (
-          <p className="mt-4 text-center text-sm font-semibold text-gray-700">
+          <p className="mt-4 text-center text-sm font-semibold text-slate-700 dark:text-gray-300">
             {uploadStatus}
           </p>
         )}
