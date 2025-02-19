@@ -110,20 +110,6 @@ builder.Services.AddLogging();
 var app = builder.Build();
 
 app.UseMiddleware<ExceptionHandlingMiddleware>();
-app.Use(async (context, next) =>
-{
-    context.Response.Headers.Append("Vary", "Origin");
-    context.Response.Headers.Append("Access-Control-Allow-Origin", 
-        context.Request.Headers["Origin"].ToString());
-    
-    if (context.Request.Headers["User-Agent"].ToString().Contains("Safari") &&
-        !context.Request.Headers["User-Agent"].ToString().Contains("Chrome"))
-    {
-        context.Response.Headers.Append("P3P", "CP=\"This is not a P3P policy!\"");
-    }
-    
-    await next();
-});
 if(!app.Environment.IsDevelopment())
 {
     app.UseCors("AllowFrontend");

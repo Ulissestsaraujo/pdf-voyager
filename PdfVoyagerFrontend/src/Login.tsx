@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "./context/AuthContext";
+import { useStorageAccess } from "./hooks/useStorageAccess";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -8,9 +9,15 @@ const Login = () => {
   const [error, setError] = useState("");
   const navigate = useNavigate();
   const { login } = useAuth();
+  const { requestAccess } = useStorageAccess();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    const successAccess = await requestAccess();
+    if (!successAccess) {
+      setError("Storage access denied. Please allow access to continue.");
+      return;
+    }
     const success = await login(email, password);
     if (success) {
       navigate("/");
