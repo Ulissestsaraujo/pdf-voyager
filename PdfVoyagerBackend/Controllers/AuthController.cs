@@ -81,6 +81,11 @@ public class AuthController(DbService dbService, JwtService jwtService, IWebHost
             cookieOptionsAccess.Domain = "localhost";
             cookieOptionsRefresh.Domain = "localhost";
         }
+        if (!environment.IsDevelopment())
+        {
+            cookieOptionsAccess.Domain = ".pdfvoyager.com";
+            cookieOptionsRefresh.Domain = ".pdfvoyager.com";
+        }
         Response.Cookies.Delete("accessToken", cookieOptionsAccess);
         Response.Cookies.Delete("refreshToken", cookieOptionsRefresh);
         return Ok(new { Message = "Logged out successfully" });
@@ -130,6 +135,12 @@ public class AuthController(DbService dbService, JwtService jwtService, IWebHost
         {
             cookieOptionsAccess.Domain = "localhost";
             cookieOptionsRefresh.Domain = "localhost";
+        }
+        
+        if (!environment.IsDevelopment())
+        {
+            cookieOptionsAccess.Domain = ".pdfvoyager.com";
+            cookieOptionsRefresh.Domain = ".pdfvoyager.com";
         }
 
         Response.Cookies.Append("accessToken", accessToken, cookieOptionsAccess);
