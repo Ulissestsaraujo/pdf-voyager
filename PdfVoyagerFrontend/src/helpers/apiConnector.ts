@@ -1,6 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import axios, { AxiosError } from "axios";
-import { useAuth } from "../context/AuthContext";
 
 export const api = axios.create({
   baseURL: import.meta.env.VITE_API_BASE_URL,
