@@ -14,13 +14,12 @@ PDF Voyager is a **cloud-based document management system** that allows users to
 - **Cross-Device Sync** – Progress is saved, allowing users to **resume where they left off**. 
 - **Secure Authentication** – HttpOnly Secure Cookies with JWT access and refresh tokens.
 - **Cost-Effective & Scalable** – Built using Azure services with **serverless hosting** and 90% Free tier.
+- **Mobile reading experience** - Improved mobile mode reading experience
 - **Highlighting and Note taking** - Enable highlights and notes to be taken. Add direct access to highlights **TODO**.
 - **Customizable color pallettes for Highlighting** - Enable the user to pick a small pallette of colors that they which to colour their highlights with **TODO**.
 - **Eye to view password** - Needs an eye to click on to view password when inputing it. **TODO**
 - **Rename and delete assets** - Enable deleting and renaming files. **TODO**
 - **Folders** - Enable sorting pdfs in differnet folders. **TODO**
-- **Mobile reading experience** - Improve mobile mode reading experience **TODO**
-- **Fix existing bugs** - Theme swap on mobile, refreshing of tokens.
 
 ---
 
