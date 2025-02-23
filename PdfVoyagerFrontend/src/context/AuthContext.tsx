@@ -1,5 +1,11 @@
 // src/context/AuthContext.tsx
-import { createContext, useContext, useEffect, useState } from "react";
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import { api } from "../helpers/apiConnector";
 import useInterval from "../hooks/useInterval";
 
@@ -16,27 +22,39 @@ const AuthContext = createContext<AuthContextType>({} as AuthContextType);
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
+  const [refreshPromise, setRefreshPromise] = useState<Promise<void> | null>(
+    null
+  );
 
   const login = async (email: string, password: string) => {
     try {
       await api.post("/api/auth/login", { email, password });
-      await checkAuth();
       return true;
     } catch {
       return false;
-    }
-  };
-
-  const checkAuth = async () => {
-    try {
-      await api.get("/api/auth/user-info");
-      setIsAuthenticated(true);
-    } catch {
-      setIsAuthenticated(false);
     } finally {
       setIsLoading(false);
     }
   };
+
+  const checkAuth = useCallback(async () => {
+    try {
+      await api.get("/api/auth/user-info");
+      setIsAuthenticated(true);
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    } catch (error) {
+      if (!refreshPromise) {
+        const promise = refreshAuth();
+        setRefreshPromise(promise);
+        await promise;
+      }
+      await refreshPromise;
+      setIsAuthenticated(true);
+    } finally {
+      setIsLoading(false);
+      setRefreshPromise(null);
+    }
+  }, [refreshPromise]);
 
   const refreshAuth = async () => {
     try {
@@ -57,7 +75,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     checkAuth();
-  }, []);
+  }, [checkAuth]);
 
   useInterval(() => {
     if (isAuthenticated) refreshAuth();
