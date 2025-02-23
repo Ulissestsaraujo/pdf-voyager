@@ -44,37 +44,33 @@ api.interceptors.response.use(
     const originalRequest = error.config;
 
     if (error.response?.status === 401) {
-      const message = error.response.data?.message;
-
-      if (message === "Token expired") {
-        if (isRefreshing) {
-          return new Promise((resolve, reject) => {
-            failedQueue.push({ resolve, reject });
+      if (isRefreshing) {
+        return new Promise((resolve, reject) => {
+          failedQueue.push({ resolve, reject });
+        })
+          .then(() => {
+            originalRequest._retry = true;
+            return api(originalRequest);
           })
-            .then(() => {
-              originalRequest._retry = true;
-              return api(originalRequest);
-            })
-            .catch((err) => Promise.reject(err));
-        }
+          .catch((err) => Promise.reject(err));
+      }
 
-        originalRequest._retry = true;
-        isRefreshing = true;
+      originalRequest._retry = true;
+      isRefreshing = true;
 
-        try {
-          const { data } = await api.post(
-            "/api/auth/refresh",
-            {},
-            { withCredentials: true }
-          );
-          processQueue(null, data.accessToken);
-          return api(originalRequest);
-        } catch (refreshError) {
-          processQueue(refreshError, null);
-          return Promise.reject(refreshError);
-        } finally {
-          isRefreshing = false;
-        }
+      try {
+        const { data } = await api.post(
+          "/api/auth/refresh",
+          {},
+          { withCredentials: true }
+        );
+        processQueue(null, data.accessToken);
+        return api(originalRequest);
+      } catch (refreshError) {
+        processQueue(refreshError, null);
+        return Promise.reject(refreshError);
+      } finally {
+        isRefreshing = false;
       }
     }
 
