@@ -1,9 +1,9 @@
 import { Navigate, Outlet } from "react-router-dom";
-import { useAuthCheck } from "./hooks/useAuthCheck";
 import { useEffect, useState } from "react";
+import { useAuth } from "./context/AuthContext";
 
 export const ProtectedRoute = () => {
-  const { isAuthenticated, isLoading } = useAuthCheck();
+  const { isAuthenticated, isLoading } = useAuth();
   const [showLoading, setShowLoading] = useState(false);
 
   useEffect(() => {

@@ -3,6 +3,9 @@
 @custom-variant dark (&:where(.dark, .dark *));
 
 @layer utilities {
+  .min-h-screen-nav {
+    min-height: calc(100vh - 5rem);
+  }
   .scrollbar-dark::-webkit-scrollbar {
     width: 8px;
   }
