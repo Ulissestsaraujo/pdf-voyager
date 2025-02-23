@@ -22,9 +22,9 @@ const App: React.FC = () => {
               <Route path="/register" element={<Register />} />
 
               <Route element={<ProtectedRoute />}>
-                <Route path="/" element={<DocumentLibrary />} />
                 <Route path="/upload" element={<PdfUploader />} />
                 <Route path="/pdf/:pdfId" element={<PdfViewer />} />
+                <Route path="/" element={<DocumentLibrary />} />
               </Route>
             </Routes>
           </main>
