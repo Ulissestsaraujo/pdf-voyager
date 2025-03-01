@@ -85,7 +85,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowFrontend", policy =>
     {
-        policy.WithOrigins("https://pdfvoyager.com")
+        policy.WithOrigins("https://pdfvoyager.com", "https://www.pdfvoyager.com")
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials();
